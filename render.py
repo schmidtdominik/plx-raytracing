@@ -12,6 +12,8 @@ from sphere import Sphere
 TODO
 - planet stuff
 - lights, reflection,..
+
+http://graphics.cs.cmu.edu/nsp/course/15-462/Spring04/slides/13-ray.pdf
 """
 
 vp_size = np.array([3, 2])  # y, z
@@ -20,14 +22,14 @@ render_count = 1
 ray_distortion = 0#0.05
 env = Environment(
     [
-        *[Sphere(np.array([100, random.randint(-120, 120), random.randint(-120, 120)]), random.randint(1, 10) / 15, np.array([1, 1, 1])) for k
-          in range(0)],
-        #Sphere(np.array([1.5, 0.5, 0.5]), 0.4, np.array([1, 0, 0])),
-        Sphere(np.array([3, -2, 0]), 1, np.array([0, 1, 0])),
-        #Sphere(np.array([3, -3, 0]), 1, np.array([0, 0, 1])),
+        *[Sphere(np.array([80, random.randint(-120, 120), random.randint(-120, 120)]), random.randint(1, 10) / 15, np.array([1, 1, 1])) for k
+          in range(250)],
+        Sphere(np.array([20, 0, -5]), 1, np.array([1, 0, 0])),
+        Sphere(np.array([3, 2, 0]), 1, np.array([0, 1, 0])),
+        Sphere(np.array([4, -2, 1]), 1, np.array([0, 0, 1])),
     ],
     [
-        Sphere(np.array([2, 2, 0]), 1, np.array([1, 1, 1]))
+        Sphere(np.array([2, 2, 0]), 2, np.array([1, 1, 1]))
     ]
 )
 
@@ -49,7 +51,7 @@ for i in range(render_count):
         next_ray_pos[np.invert(hitmap)] = rays[np.invert(hitmap)] # replace nans by original ray location
 
         dist_map_w_inf = np.abs((rays - result_w_inf)).sum(axis=1)
-        new_color_patch = o.naive_color_rays(next_ray_pos, ray_dirs)[hitmap]
+        #new_color_patch = o.naive_color_rays(next_ray_pos, ray_dirs)[hitmap]
 
         # nonrecursive first bounce
 
@@ -60,13 +62,20 @@ for i in range(render_count):
 
         refl_dir = 2*(sphere_normals * ray_dirs_ss) * sphere_normals - ray_dirs_ss
 
+        """
         l = env.lights[0]
         _, light_hits = l.intersect(rays_ss, refl_dir)
         print(np.mean(light_hits))
-        new_color_patch[light_hits] += 1#(new_color_patch[light_hits] + 1)/2
+        new_color_patch[light_hits] += 1#(new_color_patch[light_hits] + 1)/2"""
+
+        """l = env.lights[0]
+        rays_ss = next_ray_pos[hitmap]
+        shadow_rays = l.pos - rays_ss
+        _, light_hits = l.intersect(rays_ss, refl_dir)"""
+
         #
 
-        # new_color_patch = o.naive_color_rays(rays_ss, refl_dir)
+        new_color_patch = o.naive_color_rays(rays_ss, refl_dir)
 
         old_color_patch = ray_cols[hitmap]
         new_dist_map_patch = dist_map_w_inf[hitmap]
