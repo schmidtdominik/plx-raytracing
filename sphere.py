@@ -38,8 +38,8 @@ class Sphere:
         surface_normals /= np.linalg.norm(surface_normals)
         cosine_dist = (ray_dirs * surface_normals).sum(axis=1) / (np.linalg.norm(ray_dirs, axis=1) * np.linalg.norm(surface_normals, axis=1))
         result = np.expand_dims(self.base_col, 0) * np.expand_dims(cosine_dist, 1)
-        return result  # np.zeros_like(ray_dirs) + self.base_col
+        return np.abs(result)  # np.zeros_like(ray_dirs) + self.base_col
 
 
-p = Sphere(np.array([3, 0, 0]), 1, np.array([0.8, 0.2, 0.2]))
+p = Sphere(np.array([3, 0, 0]), 1, np.array([0.2, 0.2, 0.8]))
 print(p.intersect(np.array([[0, 0.5, 0.5], [0, -0.5, -0.5]]), np.array([[1, 0, 0], [1, 0, 0]])))

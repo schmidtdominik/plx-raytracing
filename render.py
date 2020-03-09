@@ -15,16 +15,16 @@ TODO
 """
 
 vp_size = np.array([3, 2])  # y, z
-res = 400*vp_size  # y, z
+res = 500*vp_size  # y, z
 render_count = 1
 ray_distortion = 0#0.05
 env = Environment(
     [
         *[Sphere(np.array([100, random.randint(-120, 120), random.randint(-120, 120)]), random.randint(1, 10) / 15, np.array([1, 1, 1])) for k
           in range(0)],
+        Sphere(np.array([2, 0.5, 0.5]), 0.4, np.array([0.2, 0.8, 0.2])),
         Sphere(np.array([3, 0, 0]), 1, np.array([0.2, 0.2, 0.8])),
         Sphere(np.array([3, -3, 0]), 1, np.array([0.8, 0.2, 0.2])),
-        Sphere(np.array([5, 3, 1]), 1, np.array([0.2, 0.8, 0.2])),
      ],
     [
 
@@ -42,22 +42,24 @@ for i in range(render_count):
 
     for o in tqdm(env.objects):
         result, hit = o.intersect(rays, ray_dirs)
-        result[np.invert(hit)] = rays[np.invert(hit)]
+        result[np.invert(hit)] = rays[np.invert(hit)] # replace nans by original ray location
         ray_cols[hit] = o.naive_color_rays(result, ray_dirs)[hit]
+        plt.imshow(o.naive_color_rays(result, ray_dirs).reshape((res[1], res[0], 3)))
+        plt.show()
 
-        render += ray_cols.reshape((res[1], res[0], 3))
         img = hit.reshape((res[1], res[0]))
         plt.imshow(img.astype(np.float))
         plt.colorbar()
         plt.show()
 
-        result = (result-rays).sum(axis=1)
-        img = result.reshape((res[1], res[0]))
+        dists = np.abs((result-rays)).sum(axis=1)
+        img = dists.reshape((res[1], res[0]))
         plt.imshow(img)
         plt.colorbar()
         plt.show()
+    render = ray_cols.reshape((res[1], res[0], 3))
 render /= render_count
 
-plt.imshow(-render)
+plt.imshow(render)
 plt.show()
 
