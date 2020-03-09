@@ -29,7 +29,7 @@ class Sphere:
         sel_sols = np.minimum(sol1, sol2)
         hit = np.invert(np.isnan(sel_sols))
         res = rays+ray_dirs*np.expand_dims(sel_sols, axis=1)
-        res[np.invert(hit)] = np.nan
+        res[np.invert(hit)] = np.inf
         return res, hit
 
     def naive_color_rays(self, rays, ray_dirs):
